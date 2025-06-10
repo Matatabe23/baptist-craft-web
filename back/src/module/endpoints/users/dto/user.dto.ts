@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsNumber, IsBoolean, IsDate } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { MUST_BE_BOOLEAN, MUST_BE_NUMBER, MUST_BE_STRING } from 'src/const/errorConst';
 
@@ -12,21 +12,29 @@ export class UsersDto {
 	id: number;
 
 	@ApiProperty({
-		description: 'Имя пользователя',
-		example: 'Иван Иванов'
+		description: 'Логин пользователя',
+		example: 'ivan_ivanov'
 	})
 	@IsNotEmpty()
 	@IsString({ message: MUST_BE_STRING })
-	name: string;
+	login: string;
 
 	@ApiProperty({
-		description: 'Роль пользователя (например, "admin", "user")',
-		example: 'admin',
+		description: 'Полное имя пользователя',
+		example: 'Иван Иванов'
+	})
+	@IsOptional()
+	@IsString({ message: MUST_BE_STRING })
+	fullName?: string;
+
+	@ApiProperty({
+		description: 'Email пользователя',
+		example: 'ivan@example.com',
 		required: false
 	})
 	@IsOptional()
 	@IsString({ message: MUST_BE_STRING })
-	role?: string;
+	email?: string;
 
 	@ApiProperty({
 		description: 'Ссылка на аватар пользователя',
@@ -38,38 +46,68 @@ export class UsersDto {
 	avatarUrl?: string;
 
 	@ApiProperty({
-		description: 'Идентификатор Telegram пользователя',
-		example: 123456789,
+		description: 'Биография пользователя',
+		example: 'Разработчик из Москвы',
 		required: false
 	})
 	@IsOptional()
-	@IsNumber({}, { message: MUST_BE_NUMBER })
-	telegramId?: number;
+	@IsString({ message: MUST_BE_STRING })
+	bio?: string;
 
 	@ApiProperty({
-		description: 'Является ли пользователь членом команды',
-		example: true,
+		description: 'Дата рождения',
+		example: '1990-01-01',
+		required: false
+	})
+	@IsOptional()
+	@IsDate()
+	dateOfBirth?: Date;
+
+	@ApiProperty({
+		description: 'Подтвержден ли email',
+		example: false,
 		required: false
 	})
 	@IsOptional()
 	@IsBoolean({ message: MUST_BE_BOOLEAN })
-	isTeamMember?: boolean;
+	isEmailVerified?: boolean;
 
 	@ApiProperty({
-		description: 'Количество игровых монет пользователя',
-		example: 100
+		description: 'Дата создания аккаунта',
+		example: '2024-01-01T00:00:00.000Z'
 	})
 	@IsNotEmpty()
-	@IsNumber({}, { message: MUST_BE_NUMBER })
-	coin: number;
+	@IsDate()
+	createdAt: Date;
+
+	@ApiProperty({
+		description: 'Дата последнего обновления',
+		example: '2024-01-01T00:00:00.000Z'
+	})
+	@IsNotEmpty()
+	@IsDate()
+	updatedAt: Date;
+
+	@ApiProperty({
+		description: 'Дата последнего входа',
+		example: '2024-01-01T00:00:00.000Z',
+		required: false
+	})
+	@IsOptional()
+	@IsDate()
+	lastLoginAt?: Date;
 
 	constructor(user: any) {
 		this.id = user.id;
-		this.name = user.name;
-		this.role = user.role;
+		this.login = user.login;
+		this.fullName = user.fullName;
+		this.email = user.email;
 		this.avatarUrl = user.avatarUrl;
-		this.telegramId = user.telegramId;
-		this.isTeamMember = user.isTeamMember;
-		this.coin = user.coin;
+		this.bio = user.bio;
+		this.dateOfBirth = user.dateOfBirth;
+		this.isEmailVerified = user.isEmailVerified;
+		this.createdAt = user.createdAt;
+		this.updatedAt = user.updatedAt;
+		this.lastLoginAt = user.lastLoginAt;
 	}
 }

@@ -1,18 +1,23 @@
-import { ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiResponse, ApiParam } from '@nestjs/swagger';
 import { UsersDto } from '../dto/user.dto';
 import { ErrorDto } from 'src/dto/error.dto';
 
-export function LoginUser(): MethodDecorator {
+export function GetUserById(): MethodDecorator {
 	return function (target, propertyKey, descriptor) {
-		ApiQuery({
-			name: 'name',
-			description: 'Имя пользователя для входа',
-			example: 'Иван Иванов'
+		ApiParam({
+			name: 'id',
+			description: 'ID пользователя',
+			example: 1
 		})(target, propertyKey, descriptor);
 		ApiResponse({
 			status: 200,
-			description: 'Успешный вход пользователя',
+			description: 'Пользователь найден',
 			type: UsersDto
+		})(target, propertyKey, descriptor);
+		ApiResponse({
+			status: 404,
+			description: 'Пользователь не найден',
+			type: ErrorDto
 		})(target, propertyKey, descriptor);
 		ApiResponse({
 			status: 500,
