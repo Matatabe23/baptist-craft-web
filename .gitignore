@@ -1,0 +1,28 @@
+# Dependency directories
+.DS_Store
+node_modules/
+/dist
+Main.db
+constENV.ts
+
+.vscode
+
+# Environment configuration
+.env
+.env.development
+.env.production
+
+
+# Build artifacts
+dist/
+build/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
