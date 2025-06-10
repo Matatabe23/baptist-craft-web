@@ -13,8 +13,14 @@ export class TokenRepository {
 		if (!payload) throw new Error('Payload is undefined');
 
 		const secretKey = isRefreshToken
-			? this.configService.get('SECRET_KEY_REFRESH')
-			: this.configService.get('SECRET_KEY_ACCESS');
+			? this.configService.get('secretKeyRefresh')
+			: this.configService.get('secretKeyAccess');
+
+		console.log(
+			isRefreshToken,
+			this.configService.get('secretKeyRefresh'),
+			this.configService.get('secretKeyAccess')
+		);
 
 		if (!secretKey) {
 			throw new Error('SECRET_KEY is not defined');
@@ -32,7 +38,7 @@ export class TokenRepository {
 
 	validateRefreshToken(refreshToken: string) {
 		try {
-			const secret = this.configService.get('SECRET_KEY_REFRESH');
+			const secret = this.configService.get('secretKeyRefresh');
 			return this.jwtService.verify(refreshToken, { secret });
 		} catch (e) {
 			throw new UnauthorizedException('Invalid or expired refresh token');

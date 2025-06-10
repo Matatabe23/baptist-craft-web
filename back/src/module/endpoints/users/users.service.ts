@@ -26,12 +26,21 @@ export class UsersService {
 
 	async register(registerDto: RegisterPasswordDto) {
 		// Проверяем, существует ли пользователь с таким логином
-		const existingUser = await this.usersRepository.findOne({
+		const existingUserByLogin = await this.usersRepository.findOne({
 			where: { login: registerDto.login }
 		});
 
-		if (existingUser) {
+		if (existingUserByLogin) {
 			throw new ConflictException('Пользователь с таким логином уже существует');
+		}
+
+		// Проверяем, существует ли пользователь с таким email
+		const existingUserByEmail = await this.usersRepository.findOne({
+			where: { email: registerDto.email }
+		});
+
+		if (existingUserByEmail) {
+			throw new ConflictException('Пользователь с таким email уже существует');
 		}
 
 		// Хешируем пароль
@@ -42,8 +51,8 @@ export class UsersService {
 		const newUser = await this.usersRepository.create({
 			login: registerDto.login,
 			password: hashedPassword,
-			fullName: registerDto.fullName,
 			email: registerDto.email,
+			fullName: registerDto.fullName,
 			avatarUrl: registerDto.avatarUrl,
 			bio: registerDto.bio,
 			isEmailVerified: false

@@ -10,7 +10,7 @@ import { TokenRepository } from './token.repository';
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			useFactory: async (configService: ConfigService) => ({
-				secret: configService.get('SECRET_KEY_ACCESS'),
+				secret: configService.get('secretKeyAccess'),
 				signOptions: { expiresIn: '1d' }
 			}),
 			inject: [ConfigService]

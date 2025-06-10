@@ -3,6 +3,7 @@ export default () => ({
 	isDev: process.env.NODE_ENV === 'development',
 	telegramBotApiToken: process.env.TELEGRAM_BOT_API_TOKEN,
 	secretKeyAccess: process.env.SECRET_KEY_ACCESS,
+	secretKeyRefresh: process.env.SECRET_KEY_REFRESH,
 	s3BucketName: process.env.S3_BUCKET_NAME,
 	s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
 	s3FolderName: process.env.S3_FOLDER_SAVED,

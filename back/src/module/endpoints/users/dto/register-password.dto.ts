@@ -20,21 +20,21 @@ export class RegisterPasswordDto {
 	password: string;
 
 	@ApiProperty({
-		description: 'Полное имя пользователя',
-		example: 'Иван Иванов'
+		description: 'Email пользователя',
+		example: 'ivan@example.com'
 	})
 	@IsNotEmpty()
-	@IsString({ message: MUST_BE_STRING })
-	fullName: string;
+	@IsEmail({}, { message: 'Неверный формат email' })
+	email: string;
 
 	@ApiProperty({
-		description: 'Email пользователя',
-		example: 'ivan@example.com',
+		description: 'Полное имя пользователя',
+		example: 'Иван Иванов',
 		required: false
 	})
 	@IsOptional()
-	@IsEmail({}, { message: 'Неверный формат email' })
-	email?: string;
+	@IsString({ message: MUST_BE_STRING })
+	fullName?: string;
 
 	@ApiProperty({
 		description: 'Ссылка на аватар пользователя',
