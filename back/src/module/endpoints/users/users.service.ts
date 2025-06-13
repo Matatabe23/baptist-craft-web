@@ -2,7 +2,9 @@ import {
 	Injectable,
 	NotFoundException,
 	UnauthorizedException,
-	ConflictException
+	ConflictException,
+	BadRequestException,
+	ForbiddenException
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
@@ -14,6 +16,7 @@ import { RegisterPasswordDto } from './dto/register-password.dto';
 import { LoginPasswordDto } from './dto/login-password.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
 import { RefreshTokenService } from 'src/module/service/refresh-token/refresh-token.service';
+import { LoginPasswordLauncherDto } from './dto/login-password-launcher.dto';
 
 @Injectable()
 export class UsersService {
@@ -102,6 +105,43 @@ export class UsersService {
 			accessToken,
 			refreshToken,
 			user: { ...resultDto }
+		};
+	}
+
+	async loginLauncher(loginDto: LoginPasswordLauncherDto) {
+		if (!loginDto.Login || !loginDto.Password) {
+			throw new BadRequestException({ Message: 'Login and Password are required' });
+		}
+
+		// Ищем пользователя по логину
+		const user = await this.usersRepository.findOne({
+			where: { login: loginDto.Login }
+		});
+
+		if (!user) {
+			throw new NotFoundException({ Message: 'Пользователь не найден' });
+		}
+
+		// Здесь можно добавить проверку блокировки
+		console.log(user);
+		if (user.isBlocked) {
+			throw new ForbiddenException({ Message: 'Пользователь заблокирован' });
+		}
+
+		// Проверяем пароль
+		const isPasswordValid = await bcrypt.compare(loginDto.Password, user.password);
+		if (!isPasswordValid) {
+			throw new UnauthorizedException({ Message: 'Неверный логин или пароль' });
+		}
+
+		// Обновляем время последнего входа
+		await user.update({ lastLoginAt: new Date() });
+
+		// Возвращаем ожидаемый ответ
+		return {
+			Login: user.login,
+			UserUuid: user.uuid,
+			Message: 'Успешная авторизация'
 		};
 	}
 

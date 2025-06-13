@@ -6,6 +6,15 @@ export class Users extends Model {
 	@Column({ primaryKey: true, autoIncrement: true })
 	id: number;
 
+	// ▶️ новое поле
+	@Column({
+		type: DataType.UUID,
+		defaultValue: DataType.UUIDV4,
+		unique: true,
+		allowNull: false
+	})
+	uuid: string;
+
 	@Column({ unique: true, allowNull: false })
 	login: string;
 
@@ -29,6 +38,9 @@ export class Users extends Model {
 
 	@Column({ type: DataType.BOOLEAN, defaultValue: false })
 	isEmailVerified: boolean;
+
+	@Column({ type: DataType.BOOLEAN, defaultValue: false })
+	isBlocked: boolean;
 
 	@Column({ type: DataType.DATE, defaultValue: DataType.NOW })
 	createdAt: Date;

@@ -15,7 +15,7 @@ const dbList = [Users, RefreshTokens];
 			useFactory: async (configService: ConfigService) => ({
 				dialect: 'mysql',
 				host: configService.get('dbHost'),
-				port: 3307,
+				port: 3306,
 				username: configService.get('dbUser'),
 				password: configService.get('dbPassword'),
 				database: configService.get('dbName'),

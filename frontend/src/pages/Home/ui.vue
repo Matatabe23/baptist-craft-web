@@ -1,7 +1,7 @@
 <template>
-	<Auth />
+	<Home />
 </template>
 
 <script lang="ts" setup>
-	import { Auth } from '@/entities';
+	import { Home } from '@/entities';
 </script>

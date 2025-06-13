@@ -24,6 +24,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterPasswordDto } from './dto/register-password.dto';
 import { LoginPasswordDto } from './dto/login-password.dto';
 import { RefreshTokenDto, RevokeTokenDto } from './dto/refresh-token.dto';
+import { LoginPasswordLauncherDto } from './dto/login-password-launcher.dto';
 
 @Controller('user')
 @ApiTags('Пользователи')
@@ -52,6 +53,23 @@ export class UsersController {
 	async login(@Body() loginDto: LoginPasswordDto) {
 		try {
 			const result = await this.userService.login(loginDto);
+			return result;
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				e.status || HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
+	@Post('login-launcher')
+	@LoginPassword()
+	async loginLauncher(@Body() loginDto: LoginPasswordLauncherDto) {
+		try {
+			const result = await this.userService.loginLauncher(loginDto);
 			return result;
 		} catch (e) {
 			throw new HttpException(

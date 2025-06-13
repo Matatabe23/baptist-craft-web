@@ -1,1 +1,0 @@
-export { default as ConfirmAction } from './ui.vue';

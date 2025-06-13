@@ -10,12 +10,10 @@ import { router } from './app/router';
 
 import vuetify from '@/shared/plugins/vuetify';
 import Toast, { toastOptions } from '@/shared/plugins/toast';
-import { socket } from '@/shared';
 
 const app = createApp(App);
 const pinia = createPinia();
 
-app.config.globalProperties.$socket = socket;
 
 app.use(FloatingVue)
     .use(pinia)
@@ -28,4 +26,3 @@ app.use(FloatingVue)
     .use(VueTheMask)
     .mount('#app');
 
-socket.connect();

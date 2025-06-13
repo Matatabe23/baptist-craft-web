@@ -1,1 +1,0 @@
-export { default as PaginationPostData } from './ui.vue';
