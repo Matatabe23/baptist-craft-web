@@ -214,4 +214,20 @@ export class UsersController {
 			);
 		}
 	}
+
+	@Post('confirm-email')
+	async confirmEmail(@Body() body: { token: string }) {
+		try {
+			const result = await this.userService.confirmEmail(body.token);
+			return result;
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				e.status || HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
 }

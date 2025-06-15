@@ -1,6 +1,7 @@
 
 
 import axios from 'axios';
+export * from './users';
 
 export const getMainInfo = async () => {
     const { data } = await $autHost.get('main-info');

@@ -4,7 +4,19 @@
 
 html {
 	scroll-behavior: smooth;
-    @extend %custom-scroll;
+	@extend %custom-scroll;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	min-height: 100vh;
+
+	background-image: url('/public/images/bg.jpg');
+	background-size: cover; /* Масштабирует фон, чтобы покрыть весь экран */
+	background-repeat: no-repeat; /* Запрещает повторение */
+	background-attachment: fixed; /* Фиксирует фон при скролле */
+	background-position: center; /* Центрирует изображение */
 }
 
 %custom-scroll {

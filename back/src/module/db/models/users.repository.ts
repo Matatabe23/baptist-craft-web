@@ -42,6 +42,18 @@ export class Users extends Model {
 	@Column({ type: DataType.BOOLEAN, defaultValue: false })
 	isBlocked: boolean;
 
+	@Column({
+		type: DataType.STRING,
+		allowNull: true
+	})
+	emailVerificationToken: string;
+
+	@Column({
+		type: DataType.DATE,
+		allowNull: true
+	})
+	emailVerificationTokenExpires: boolean;
+
 	@Column({ type: DataType.DATE, defaultValue: DataType.NOW })
 	createdAt: Date;
 

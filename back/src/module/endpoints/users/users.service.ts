@@ -17,6 +17,10 @@ import { LoginPasswordDto } from './dto/login-password.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
 import { RefreshTokenService } from 'src/module/service/refresh-token/refresh-token.service';
 import { LoginPasswordLauncherDto } from './dto/login-password-launcher.dto';
+import { MailRepository } from 'src/module/service/mail/mail.repository';
+import * as fs from 'fs';
+import * as path from 'path';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +28,8 @@ export class UsersService {
 		@InjectModel(Users)
 		private readonly usersRepository: typeof Users,
 		private readonly tokenRepository: TokenRepository,
-		private readonly refreshTokenService: RefreshTokenService
+		private readonly refreshTokenService: RefreshTokenService,
+		private readonly mailRepo: MailRepository
 	) {}
 
 	async register(registerDto: RegisterPasswordDto) {
@@ -50,6 +55,23 @@ export class UsersService {
 		const saltRounds = 10;
 		const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
 
+		const templatePath = path.join(process.cwd(), 'templates', 'confirm-template.html');
+		let html = fs.readFileSync(templatePath, 'utf8');
+
+		const verificationToken = randomBytes(32).toString('hex');
+		const tokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
+
+		// Формируем ссылку (можно вставить токен и query-параметры)
+		const confirmationLink = `${process.env.FRONT_URL}?form=confirm-email&token=${verificationToken}`;
+		html = html.replace('{{link}}', confirmationLink);
+
+		await this.mailRepo.sendMail({
+			from: process.env.MAIL_USER,
+			to: registerDto.email,
+			subject: 'Подтверждение регистрации',
+			html
+		});
+
 		// Создаем нового пользователя
 		const newUser = await this.usersRepository.create({
 			login: registerDto.login,
@@ -58,7 +80,9 @@ export class UsersService {
 			fullName: registerDto.fullName,
 			avatarUrl: registerDto.avatarUrl,
 			bio: registerDto.bio,
-			isEmailVerified: false
+			isEmailVerified: false,
+			emailVerificationToken: verificationToken,
+			emailVerificationTokenExpires: tokenExpires
 		});
 
 		const resultDto = new UsersDto(newUser.dataValues);
@@ -83,6 +107,10 @@ export class UsersService {
 
 		if (!user) {
 			throw new UnauthorizedException('Неверные учетные данные');
+		}
+
+		if (!user.isEmailVerified) {
+			throw new UnauthorizedException('Email не подтвержден');
 		}
 
 		// Проверяем пароль
@@ -122,10 +150,13 @@ export class UsersService {
 			throw new NotFoundException({ Message: 'Пользователь не найден' });
 		}
 
+		if (!user.isEmailVerified) {
+			throw new UnauthorizedException('Email не подтвержден');
+		}
+
 		// Здесь можно добавить проверку блокировки
-		console.log(user);
 		if (user.isBlocked) {
-			throw new ForbiddenException({ Message: 'Пользователь заблокирован' });
+			throw new ForbiddenException('Пользователь заблокирован');
 		}
 
 		// Проверяем пароль
@@ -230,5 +261,21 @@ export class UsersService {
 
 		await user.destroy();
 		return { message: 'Пользователь успешно удален' };
+	}
+
+	async confirmEmail(token: string) {
+		const user = await this.usersRepository.findOne({
+			where: {
+				emailVerificationToken: token,
+				emailVerificationTokenExpires: { [Op.gt]: new Date() }
+			}
+		});
+
+		if (!user) {
+			throw new BadRequestException('Пользователь не найден');
+		}
+
+		await user.update({ isEmailVerified: true });
+		return { message: 'Email подтвержден успешно' };
 	}
 }

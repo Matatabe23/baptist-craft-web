@@ -16,12 +16,6 @@ export class TokenRepository {
 			? this.configService.get('secretKeyRefresh')
 			: this.configService.get('secretKeyAccess');
 
-		console.log(
-			isRefreshToken,
-			this.configService.get('secretKeyRefresh'),
-			this.configService.get('secretKeyAccess')
-		);
-
 		if (!secretKey) {
 			throw new Error('SECRET_KEY is not defined');
 		}

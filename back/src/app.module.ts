@@ -9,6 +9,7 @@ import { UsersModule } from './module/endpoints/users/users.module';
 import { S3Module } from './module/service/s3/s3.module';
 import { FileModule } from './module/service/files/files.module';
 import { TokenModule } from './module/service/token/token.module';
+import { MailModule } from './module/service/mail/mail.module';
 
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
@@ -25,7 +26,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 
 		S3Module,
 		FileModule,
-		TokenModule
+		TokenModule,
+		MailModule
 	],
 	controllers: [],
 	providers: []
