@@ -18,6 +18,8 @@ export class S3Repository {
 
 	constructor() {
 		this.s3Client = new S3Client(getS3ClientConfig());
+
+		// this.makeBucketPublic();
 	}
 
 	async uploadFileToS3(file: { buffer: Buffer }, fileName: string): Promise<string> {
@@ -70,28 +72,28 @@ export class S3Repository {
 					Effect: 'Allow',
 					Principal: '*',
 					Action: 's3:GetObject',
-					Resource: `arn:aws:s3:::${this.configService.get('S3_BUCKET_NAME')}/*`
+					Resource: `arn:aws:s3:::${process.env.S3_BUCKET_NAME}/*`
 				}
 			]
 		};
 
 		try {
 			const putPolicyCommand = new PutBucketPolicyCommand({
-				Bucket: this.configService.get('S3_BUCKET_NAME'),
+				Bucket: process.env.S3_BUCKET_NAME,
 				Policy: JSON.stringify(bucketPolicy)
 			});
 			await this.s3Client.send(putPolicyCommand);
 			this.logger.log('Bucket policy updated to allow public access.');
 
 			const listObjectsCommand = new ListObjectsV2Command({
-				Bucket: this.configService.get('S3_BUCKET_NAME')
+				Bucket: process.env.S3_BUCKET_NAME
 			});
 			const objects = await this.s3Client.send(listObjectsCommand);
 
 			if (objects.Contents) {
 				for (const object of objects.Contents) {
 					const putObjectAclCommand = new PutObjectAclCommand({
-						Bucket: this.configService.get('S3_BUCKET_NAME'),
+						Bucket: process.env.S3_BUCKET_NAME,
 						Key: object.Key,
 						ACL: 'public-read'
 					});
@@ -107,14 +109,14 @@ export class S3Repository {
 	// async deleteAllObjectsFromS3(): Promise<void> {
 	//   try {
 	//     const listObjectsCommand = new ListObjectsV2Command({
-	//       Bucket: this.configService.get('S3_BUCKET_NAME'),
+	//       Bucket: process.env.S3_BUCKET_NAME,
 	//     });
 	//     const objects = await this.s3Client.send(listObjectsCommand);
 
 	//     if (objects.Contents) {
 	//       for (const object of objects.Contents) {
 	//         const deleteObjectCommand = new DeleteObjectCommand({
-	//           Bucket: this.configService.get('S3_BUCKET_NAME'),
+	//           Bucket: process.env.S3_BUCKET_NAME,
 	//           Key: object.Key,
 	//         });
 	//         await this.s3Client.send(deleteObjectCommand);

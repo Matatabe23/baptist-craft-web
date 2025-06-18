@@ -15,7 +15,7 @@ services:
       - './data/certbot/www:/var/www/certbot'
     depends_on:
       - back
-      # - frontend
+      - minio
     networks:
       - dev
     restart: unless-stopped
@@ -31,7 +31,7 @@ services:
       MYSQL_USER: ${MYSQL_ADMIN_USER}
       MYSQL_PASSWORD: ${MYSQL_ADMIN_PASSWORD}
     ports:
-      - "3306:3306"  # ✅ Вернули стандартный порт
+      - "3306:3306"
     volumes:
       - ./data/backups:/backups
       - ./data/mysql:/var/lib/mysql
@@ -62,15 +62,31 @@ services:
     env_file:
       - .env
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     args:
-  #       VITE_APP_BACKEND_API_URL: ${VITE_APP_BACKEND_API_URL}
-  #   depends_on:
-  #     - back
-  #   restart: unless-stopped
-  #   networks:
-  #     - dev
-  #   env_file:
-  #     - .env
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_APP_BACKEND_API_URL: ${VITE_APP_BACKEND_API_URL}
+    depends_on:
+      - back
+    restart: unless-stopped
+    networks:
+      - dev
+    env_file:
+      - .env
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Web UI
+    volumes:
+      - ./data/minio:/data
+    networks:
+      - dev
+    restart: unless-stopped
